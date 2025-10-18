@@ -1,0 +1,115 @@
+# application.yml
+spring:
+  application:
+    name: order-service
+  mvc:
+    log-resolved-exception: false
+
+  datasource:
+    url: jdbc:h2:mem:orderdb
+    username: sa
+    password:
+
+    hikari:
+      minimum-idle: 5
+      maximum-pool-size: 20
+      idle-timeout: 300000
+      max-lifetime: 1200000
+      connection-timeout: 20000
+      pool-name: OrderServiceHikariPool
+      auto-commit: true
+      transaction-isolation: TRANSACTION_READ_COMMITTED
+
+  jpa:
+    hibernate:
+      ddl-auto: none
+    show-sql: true
+    properties:
+      hibernate:
+        format_sql: true
+        dialect: org.hibernate.dialect.H2Dialect
+
+  sql:
+    init:
+      mode: always
+      platform: h2
+
+  h2:
+    console:
+      enabled: true
+      path: /h2-console
+
+# SpringDoc/Swagger Configuration for default profile
+springdoc:
+  api-docs:
+    path: /v3/api-docs
+  swagger-ui:
+    path: /swagger-ui.html
+    enabled: true
+    operations-sorter: method
+    tags-sorter: alpha
+    try-it-out-enabled: true
+  packages-to-scan: com.dev.orderservice.presentation.controller
+  paths-to-match: /api/**
+
+logging:
+  level:
+    root: INFO
+    com.dev.orderservice: DEBUG
+    org.hibernate.SQL: DEBUG
+    org.hibernate.type.descriptor.sql.BasicBinder: TRACE
+
+server:
+  port: 8080
+
+---
+# application-prod.yml
+spring:
+  config:
+    activate:
+      on-profile: prod
+
+  datasource:
+    url: jdbc:postgresql://localhost:5432/orderdb
+    driver-class-name: org.postgresql.Driver
+    username: postgres
+    password: postgres
+
+    hikari:
+      minimum-idle: 10
+      maximum-pool-size: 50
+      connection-timeout: 30000
+      idle-timeout: 600000
+      max-lifetime: 1800000
+      pool-name: OrderServiceProdPool
+
+  jpa:
+    hibernate:
+      ddl-auto: none
+    show-sql: false
+    properties:
+      hibernate:
+        dialect: org.hibernate.dialect.PostgreSQLDialect
+
+  sql:
+    init:
+      mode: always
+      platform: postgresql
+
+# SpringDoc/Swagger Configuration for production
+springdoc:
+  api-docs:
+    path: /v3/api-docs
+  swagger-ui:
+    path: /swagger-ui.html
+    enabled: false  # Typically disabled in production for security
+    operations-sorter: method
+    tags-sorter: alpha
+    try-it-out-enabled: false
+  packages-to-scan: com.dev.orderservice.presentation.controller
+  paths-to-match: /api/**
+
+logging:
+  level:
+    root: INFO
+    com.dev.orderservice: INFO
