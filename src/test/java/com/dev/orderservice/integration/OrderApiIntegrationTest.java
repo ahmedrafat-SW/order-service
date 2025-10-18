@@ -3,6 +3,8 @@ package com.dev.orderservice.integration;
 import com.dev.orderservice.application.dto.CreateOrderRequest;
 import com.dev.orderservice.application.dto.OrderItemRequest;
 import com.dev.orderservice.domain.model.Product;
+import com.dev.orderservice.domain.repository.OrderRepository;
+import com.dev.orderservice.domain.repository.PaymentRepository;
 import com.dev.orderservice.domain.repository.ProductRepository;
 import com.dev.orderservice.domain.valueobject.PaymentMethod;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -39,24 +41,36 @@ class OrderApiIntegrationTest {
     @Autowired
     private ProductRepository productRepository;
 
+    @Autowired
+    private OrderRepository orderRepository;
+
+    @Autowired
+    private PaymentRepository paymentRepository;
+
     private Product product1;
     private Product product2;
 
     @BeforeEach
     void setUp() {
+
+        paymentRepository.deleteAll();
+        orderRepository.deleteAll();
+        productRepository.deleteAll();
+
         product1 = Product.builder()
                 .name("Test Product 1")
                 .price(new BigDecimal("100.00"))
-                .stockQuantity(100)
+                .stockQuantity(400)
                 .build();
         product1 = productRepository.save(product1);
 
         product2 = Product.builder()
                 .name("Test Product 2")
                 .price(new BigDecimal("200.00"))
-                .stockQuantity(50)
+                .stockQuantity(200)
                 .build();
         product2 = productRepository.save(product2);
+        productRepository.flush();
     }
 
     @Test
@@ -132,7 +146,7 @@ class OrderApiIntegrationTest {
         // Arrange
         OrderItemRequest item = OrderItemRequest.builder()
                 .productId(product1.getId())
-                .quantity(200) // More than available
+                .quantity(500) // More than available
                 .build();
 
         CreateOrderRequest request = CreateOrderRequest.builder()
@@ -278,8 +292,8 @@ class OrderApiIntegrationTest {
         // Act & Assert
         mockMvc.perform(get("/api/orders/999")
                         .contentType(MediaType.APPLICATION_JSON))
-                .andExpect(status().isInternalServerError())
-                .andExpect(jsonPath("$.message").value(containsString("Order not found")));
+                .andExpect(status().isNotFound())
+                .andExpect(jsonPath("$.error").value("Order Not Found"));
     }
 
     @Test

@@ -12,8 +12,8 @@ import java.util.List;
 @Repository
 public interface OrderRepository extends JpaRepository<Order, Long> {
     Page<Order> findAll(Pageable pageable);
-    @Query(value = "SELECT * FROM orders WHERE total_amount > :amount", nativeQuery = true)
+    @Query(value = "SELECT * FROM orders WHERE total_amount >= :amount", nativeQuery = true)
     List<Order> findHighValueOrders(BigDecimal amount);
-    @Query(value = "SELECT * FROM orders WHERE total_amount > 1000", nativeQuery = true)
+    @Query(value = "SELECT * FROM orders WHERE total_amount >= 1000", nativeQuery = true)
     List<Order> findHighValueOrders();
 }

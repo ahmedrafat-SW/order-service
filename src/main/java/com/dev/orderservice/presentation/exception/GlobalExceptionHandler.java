@@ -1,6 +1,7 @@
 package com.dev.orderservice.presentation.exception;
 
 import com.dev.orderservice.domain.exception.InsufficientStockException;
+import com.dev.orderservice.domain.exception.OrderNotFoundException;
 import com.dev.orderservice.domain.exception.PaymentFailedException;
 import com.dev.orderservice.domain.exception.ProductNotFoundException;
 import lombok.extern.slf4j.Slf4j;
@@ -81,4 +82,15 @@ public class GlobalExceptionHandler {
         return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(error);
     }
 
+    @ExceptionHandler(OrderNotFoundException.class)
+    public ResponseEntity<?> handleOrderNotFound(OrderNotFoundException ex) {
+        ErrorResponse error = ErrorResponse.builder()
+                .timestamp(LocalDateTime.now())
+                .status(HttpStatus.NOT_FOUND.value())
+                .error("Order Not Found")
+                .message(ex.getMessage())
+                .build();
+
+        return ResponseEntity.status(HttpStatus.NOT_FOUND).body(error);
+    }
 }

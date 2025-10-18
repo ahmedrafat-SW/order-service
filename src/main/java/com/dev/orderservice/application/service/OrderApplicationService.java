@@ -3,6 +3,7 @@ package com.dev.orderservice.application.service;
 import com.dev.orderservice.application.dto.*;
 import com.dev.orderservice.domain.event.OrderCreatedEvent;
 import com.dev.orderservice.domain.exception.InsufficientStockException;
+import com.dev.orderservice.domain.exception.OrderNotFoundException;
 import com.dev.orderservice.domain.exception.PaymentFailedException;
 import com.dev.orderservice.domain.exception.ProductNotFoundException;
 import com.dev.orderservice.domain.model.*;
@@ -127,7 +128,7 @@ public class OrderApplicationService {
     public OrderResponse getOrderById(Long orderId) {
         log.info("Fetching order by ID: {}", orderId);
         Order order = orderRepository.findById(orderId)
-                .orElseThrow(() -> new RuntimeException("Order not found with ID: " + orderId));
+                .orElseThrow(() -> new OrderNotFoundException(orderId));
         return mapToOrderResponse(order);
     }
 
